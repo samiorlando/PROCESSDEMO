@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RADIO PRO - Procesador de Audio Profesional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .panel {
+            background: rgba(20, 26, 47, 0.8);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel::-webkit-scrollbar-track {
+            background: rgba(100, 200, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .panel::-webkit-scrollbar-thumb {
+            background: rgba(100, 200, 255, 0.4);
+            border-radius: 3px;
+        }
+
+        .left-panel {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .right-panel {
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(100, 200, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #64c8ff;
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 11px;
+            color: #8899bb;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64c8ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-label {
+            font-size: 11px;
+            color: #aabbcc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-value {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #64c8ff;
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, 
+                #1a3a4a 0%, 
+                #2a5a7a 50%, 
+                #1a3a4a 100%);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64c8ff, #3a9fdd);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(100, 200, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64c8ff, #3a9fdd);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(100, 200, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(30, 50, 80, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            color: #64c8ff;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        select:hover {
+            border-color: rgba(100, 200, 255, 0.6);
+            background: rgba(40, 60, 90, 0.8);
+        }
+
+        select option {
+            background: #141a2f;
+            color: #64c8ff;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: rgba(100, 200, 255, 0.15);
+            border: 1px solid rgba(100, 200, 255, 0.4);
+            color: #64c8ff;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: rgba(100, 200, 255, 0.25);
+            border-color: rgba(100, 200, 255, 0.6);
+            box-shadow: 0 0 12px rgba(100, 200, 255, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.active {
+            background: rgba(100, 200, 255, 0.35);
+            box-shadow: 0 0 16px rgba(100, 200, 255, 0.5);
+        }
+
+        button.danger {
+            border-color: rgba(255, 100, 100, 0.4);
+            color: #ff6464;
+        }
+
+        button.danger:hover {
+            background: rgba(255, 100, 100, 0.15);
+            border-color: rgba(255, 100, 100, 0.6);
+            box-shadow: 0 0 12px rgba(255, 100, 100, 0.3);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .meter {
+            background: rgba(15, 25, 45, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            height: 24px;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(to right, 
+                #00c800 0%, 
+                #ffff00 70%, 
+                #ff4400 100%);
+            width: 0%;
+            transition: width 0.05s linear;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .meter-text {
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #64c8ff;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            z-index: 2;
+        }
+
+        .spectrum-container {
+            background: rgba(15, 25, 45, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            height: 160px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .eq-graph {
+            background: rgba(15, 25, 45, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            height: 140px;
+            position: relative;
+        }
+
+        .knob-group {
+            display: flex;
+            gap: 12px;
+            justify-content: space-around;
+            margin: 16px 0;
+        }
+
+        .knob {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .knob-label {
+            font-size: 10px;
+            color: #aabbcc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .knob-value {
+            font-size: 11px;
+            color: #64c8ff;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .led-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .led-indicator.active {
+            background: #00c800;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 200, 0, 0.8);
+        }
+
+        .led-indicator.clipping {
+            background: #ff0000;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 0, 0, 0.8);
+            animation: clip-pulse 0.5s infinite;
+        }
+
+        @keyframes clip-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .power-button {
+            width: 100%;
+            height: 48px;
+            font-size: 14px;
+            font-weight: 700;
+            background: rgba(100, 150, 255, 0.1);
+            border: 2px solid rgba(100, 150, 255, 0.4);
+            color: #64c8ff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .power-button:hover {
+            background: rgba(100, 150, 255, 0.2);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.3);
+        }
+
+        .power-button.on {
+            background: rgba(0, 200, 100, 0.15);
+            border-color: rgba(0, 200, 100, 0.5);
+            color: #00dd88;
+            box-shadow: 0 0 20px rgba(0, 200, 100, 0.3);
+        }
+
+        .master-section {
+            background: rgba(30, 50, 80, 0.4);
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .master-volume {
+            height: 120px;
+            background: rgba(15, 25, 45, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            padding: 8px;
+            position: relative;
+            margin-top: 12px;
+        }
+
+        .master-slider {
+            width: 100%;
+            height: 100%;
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+            outline: none;
+        }
+
+        .bypass-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(100, 200, 255, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 11px;
+            color: #aabbcc;
+        }
+
+        .bypass-toggle:hover {
+            background: rgba(100, 200, 255, 0.15);
+            border-color: rgba(100, 200, 255, 0.4);
+        }
+
+        .bypass-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #64c8ff;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #aabbcc;
+        }
+
+        .info-box {
+            background: rgba(50, 100, 150, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: #aabbcc;
+            line-height: 1.5;
+        }
+
+        .tab-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tab-button {
+            padding: 8px;
+            font-size: 10px;
+        }
+
+        .tab-button.active {
+            background: rgba(100, 200, 255, 0.25);
+            border-color: rgba(100, 200, 255, 0.6);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo {
+            font-size: 14px;
+            color: #64c8ff;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- PANEL IZQUIERDO: INPUT Y CONTROLES GENERALES -->
+        <div class="left-panel panel">
+            <div class="header">
+                <div class="logo">⚡ RADIO PRO</div>
+                <p>Broadcast Processor</p>
+            </div>
+
+            <!-- SECCIÓN POWER -->
+            <div class="section">
+                <button id="powerBtn" class="power-button">Power On</button>
+            </div>
+
+            <!-- SECCIÓN INPUT -->
+            <div class="section">
+                <div class="section-title">📥 Input</div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Audio Input</span>
+                    </div>
+                    <select id="inputDevice">
+                        <option value="">Select Device...</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Input Gain</span>
+                        <span class="control-value"><span id="inputGainValue">0</span> dB</span>
+                    </div>
+                    <input type="range" id="inputGain" min="-24" max="24" value="0" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <div class="section-title">Input Level</div>
+                    <div class="meter">
+                        <div class="meter-fill" id="inputMeter"></div>
+                        <div class="meter-text" id="inputMeterValue">-∞ dB</div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div style="display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+                        <span class="control-label">Clipping Detection</span>
+                        <div class="led-indicator" id="inputClipLED"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN OUTPUT -->
+            <div class="section">
+                <div class="section-title">📤 Output</div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Output Device</span>
+                    </div>
+                    <select id="outputDevice">
+                        <option value="">Select Device...</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Master Volume</span>
+                        <span class="control-value"><span id="masterVolumeValue">0</span> dB</span>
+                    </div>
+                    <input type="range" id="masterVolume" min="-40" max="6" value="0" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <div class="section-title">Output Level</div>
+                    <div class="meter">
+                        <div class="meter-fill" id="outputMeter"></div>
+                        <div class="meter-text" id="outputMeterValue">-∞ dB</div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div style="display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+                        <span class="control-label">Output Clipping</span>
+                        <div class="led-indicator" id="outputClipLED"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRESETS -->
+            <div class="section">
+                <div class="section-title">⭐ Presets</div>
+                <div class="button-group">
+                    <button onclick="loadPreset('radiofm')">Radio FM</button>
+                    <button onclick="loadPreset('voice')">Voz Clara</button>
+                </div>
+                <div class="button-group" style="margin-top: 8px;">
+                    <button onclick="loadPreset('music')">Música</button>
+                    <button onclick="loadPreset('ultrabass')">Ultra Bass</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL CENTRAL: PROCESAMIENTO DSP -->
+        <div class="center-panel panel">
+            <!-- ECUALIZADOR PARAMÉTRICO -->
+            <div class="section" style="flex: 0 0 auto;">
+                <div class="section-title">🎛️ EQ Paramétrico (5 Bandas)</div>
+                <div class="bypass-toggle">
+                    <input type="checkbox" id="eqBypass" onchange="toggleBypass('eq', this.checked)">
+                    <label for="eqBypass">Bypass EQ</label>
+                </div>
+                
+                <div class="eq-graph">
+                    <canvas id="eqCanvas"></canvas>
+                </div>
+
+                <div class="knob-group">
+                    <div class="knob">
+                        <div class="knob-label">Sub-Bass</div>
+                        <input type="range" id="eq0" min="-12" max="12" value="0" step="0.1" style="width: 60px;" onchange="updateEQ()">
+                        <div class="knob-value"><span id="eq0Val">0</span>dB</div>
+                    </div>
+                    <div class="knob">
+                        <div class="knob-label">Bass</div>
+                        <input type="range" id="eq1" min="-12" max="12" value="0" step="0.1" style="width: 60px;" onchange="updateEQ()">
+                        <div class="knob-value"><span id="eq1Val">0</span>dB</div>
+                    </div>
+                    <div class="knob">
+                        <div class="knob-label">Mid</div>
+                        <input type="range" id="eq2" min="-12" max="12" value="0" step="0.1" style="width: 60px;" onchange="updateEQ()">
+                        <div class="knob-value"><span id="eq2Val">0</span>dB</div>
+                    </div>
+                    <div class="knob">
+                        <div class="knob-label">High-Mid</div>
+                        <input type="range" id="eq3" min="-12" max="12" value="0" step="0.1" style="width: 60px;" onchange="updateEQ()">
+                        <div class="knob-value"><span id="eq3Val">0</span>dB</div>
+                    </div>
+                    <div class="knob">
+                        <div class="knob-label">Treble</div>
+                        <input type="range" id="eq4" min="-12" max="12" value="0" step="0.1" style="width: 60px;" onchange="updateEQ()">
+                        <div class="knob-value"><span id="eq4Val">0</span>dB</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPECTRUM ANALYZER -->
+            <div class="section" style="flex: 0 0 auto;">
+                <div class="section-title">📊 Spectrum Analyzer (FFT)</div>
+                <div class="spectrum-container">
+                    <canvas id="spectrumCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- COMPRESOR MULTIBANDA -->
+            <div class="section" style="flex: 0 0 auto;">
+                <div class="section-title">🎚️ Multiband Compressor (5 Bandas)</div>
+                <div class="bypass-toggle">
+                    <input type="checkbox" id="compressorBypass" onchange="toggleBypass('compressor', this.checked)">
+                    <label for="compressorBypass">Bypass Compressor</label>
+                </div>
+
+                <div style="margin-top: 12px; max-height: 300px; overflow-y: auto;">
+                    <div id="compressorControls"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: CONFIGURACIÓN AVANZADA -->
+        <div class="right-panel panel">
+            <!-- EQ GRÁFICO -->
+            <div class="section">
+                <div class="section-title">📈 EQ Gráfico (10 Bandas)</div>
+                <div id="graphicEQControls"></div>
+            </div>
+
+            <!-- DUAL BAND COMPRESSOR LIMITER -->
+            <div class="section">
+                <div class="section-title">🔒 Dual Band Comp/Limiter</div>
+                <div class="bypass-toggle">
+                    <input type="checkbox" id="dualBandBypass" onchange="toggleBypass('dualband', this.checked)">
+                    <label for="dualBandBypass">Bypass</label>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <div class="control-label">LOW Band (20Hz - 500Hz)</div>
+                    <div style="padding: 8px; background: rgba(50, 100, 150, 0.1); border-radius: 4px; font-size: 10px; color: #aabbcc; margin-top: 6px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                            <div>
+                                <div style="margin-bottom: 4px;">Threshold</div>
+                                <input type="range" id="lowThreshold" min="-60" max="0" value="-20" step="1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="lowThresholdVal">-20</span>dB</div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 4px;">Ratio</div>
+                                <input type="range" id="lowRatio" min="1" max="8" value="4" step="0.1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="lowRatioVal">4</span>:1</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                            <div>
+                                <div style="margin-bottom: 4px;">Attack (ms)</div>
+                                <input type="range" id="lowAttack" min="1" max="100" value="10" step="1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="lowAttackVal">10</span>ms</div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 4px;">Release (ms)</div>
+                                <input type="range" id="lowRelease" min="10" max="500" value="100" step="10" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="lowReleaseVal">100</span>ms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <div class="control-label">HIGH Band (500Hz - 20kHz)</div>
+                    <div style="padding: 8px; background: rgba(50, 100, 150, 0.1); border-radius: 4px; font-size: 10px; color: #aabbcc; margin-top: 6px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                            <div>
+                                <div style="margin-bottom: 4px;">Threshold</div>
+                                <input type="range" id="highThreshold" min="-60" max="0" value="-15" step="1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="highThresholdVal">-15</span>dB</div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 4px;">Ratio</div>
+                                <input type="range" id="highRatio" min="1" max="8" value="3" step="0.1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="highRatioVal">3</span>:1</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                            <div>
+                                <div style="margin-bottom: 4px;">Attack (ms)</div>
+                                <input type="range" id="highAttack" min="1" max="100" value="5" step="1" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="highAttackVal">5</span>ms</div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 4px;">Release (ms)</div>
+                                <input type="range" id="highRelease" min="10" max="500" value="50" step="10" style="width: 100%;">
+                                <div style="margin-top: 2px; color: #64c8ff; font-weight: 700;"><span id="highReleaseVal">50</span>ms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BASS EQ -->
+            <div class="section">
+                <div class="section-title">🎸 Bass EQ</div>
+                <div class="bypass-toggle">
+                    <input type="checkbox" id="bassEqBypass" onchange="toggleBypass('basseq', this.checked)">
+                    <label for="bassEqBypass">Bypass</label>
+                </div>
+
+                <div class="control-group" style="margin-top: 12px;">
+                    <div class="control-label">
+                        <span>Bass Boost</span>
+                        <span class="control-value"><span id="bassBoostValue">0</span> dB</span>
+                    </div>
+                    <input type="range" id="bassBoost" min="0" max="12" value="0" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Bass Frequency</span>
+                        <span class="control-value"><span id="bassFreqValue">60</span> Hz</span>
+                    </div>
+                    <input type="range" id="bassFreq" min="20" max="200" value="60" step="5">
+                </div>
+
+                <button onclick="applyBassBoostPro()" style="width: 100%; margin-top: 12px;">Bass Boost Pro</button>
+            </div>
+
+            <!-- STEREO ENHANCER -->
+            <div class="section">
+                <div class="section-title">🔄 Stereo Enhancer</div>
+                <div class="bypass-toggle">
+                    <input type="checkbox" id="stereoBypass" onchange="toggleBypass('stereo', this.checked)">
+                    <label for="stereoBypass">Bypass</label>
+                </div>
+
+                <div class="control-group" style="margin-top: 12px;">
+                    <div class="control-label">
+                        <span>Width</span>
+                        <span class="control-value"><span id="stereoWidthValue">1.0</span>x</span>
+                    </div>
+                    <input type="range" id="stereoWidth" min="0" max="2" value="1" step="0.05">
+                </div>
+
+                <div class="control-group">
+                    <label class="bypass-toggle">
+                        <input type="checkbox" id="monoCompatible" onchange="updateProcessing()">
+                        <span>Mono Compatible</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN Y STATUS -->
+            <div class="section">
+                <div class="section-title">ℹ️ Status</div>
+                <div class="info-box">
+                    <div class="status-indicator">
+                        <div class="led-indicator" id="statusLED"></div>
+                        <span id="statusText">Listo</span>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 10px; color: #8899bb;">
+                        <div>Sample Rate: <span id="sampleRateInfo">N/A</span> Hz</div>
+                        <div>Latency: <span id="latencyInfo">N/A</span> ms</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 🎛️ AUDIO PROCESSOR SYSTEM
+        // ============================================
+
+        const AudioProcessor = (() => {
+            let audioContext = null;
+            let analyser = null;
+            let analyserCompare = null;
+            let mediaStream = null;
+            let sourceNode = null;
+            let processorNode = null;
+            let isProcessing = false;
+
+            // DSP State
+            const state = {
+                inputGain: 0,
+                masterVolume: 0,
+                eqEnabled: true,
+                eqValues: [0, 0, 0, 0, 0],
+                compressorEnabled: true,
+                compressorValues: [
+                    { threshold: -20, ratio: 4, attack: 10, release: 100, makeupGain: 0 },
+                    { threshold: -20, ratio: 4, attack: 10, release: 100, makeupGain: 0 },
+                    { threshold: -20, ratio: 4, attack: 10, release: 100, makeupGain: 0 },
+                    { threshold: -20, ratio: 4, attack: 10, release: 100, makeupGain: 0 },
+                    { threshold: -20, ratio: 4, attack: 10, release: 100, makeupGain: 0 },
+                ],
+                graphicEQValues: new Array(10).fill(0),
+                dualBandEnabled: true,
+                lowBandCompressor: { threshold: -20, ratio: 4, attack: 10, release: 100 },
+                highBandCompressor: { threshold: -15, ratio: 3, attack: 5, release: 50 },
+                bassEQEnabled: true,
+                bassBoost: 0,
+                bassFreq: 60,
+                stereoEnabled: true,
+                stereoWidth: 1,
+                monoCompatible: false,
+            };
+
+            // Audio Buffers para análisis
+            let inputBuffer = new Float32Array(2048);
+            let outputBuffer = new Float32Array(2048);
+            let inputBufferIndex = 0;
+            let outputBufferIndex = 0;
+
+            // Inicializar Web Audio API
+            const init = async () => {
+                if (audioContext) return;
+
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                
+                analyserCompare = audioContext.createAnalyser();
+                analyserCompare.fftSize = 2048;
+
+                // Crear nodo de ganancia de entrada
+                const inputGainNode = audioContext.createGain();
+                inputGainNode.gain.value = dbToGain(state.inputGain);
+
+                // Crear ganancia de salida (Master Volume)
+                const masterGainNode = audioContext.createGain();
+                masterGainNode.gain.value = dbToGain(state.masterVolume);
+
+                // Conectar cadena: Input → Gain → Analyser → Output → Master → Analyser output
+                inputGainNode.connect(analyser);
+                analyser.connect(masterGainNode);
+                masterGainNode.connect(analyserCompare);
+                analyserCompare.connect(audioContext.destination);
+
+                sourceNode = inputGainNode;
+                processorNode = masterGainNode;
+
+                updateStatus('Inicializado', true);
+                updateSampleRateInfo();
+
+                return audioContext;
+            };
+
+            // Obtener dispositivos de audio
+            const getAudioDevices = async () => {
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const inputDevices = devices.filter(d => d.kind === 'audioinput');
+                    const outputDevices = devices.filter(d => d.kind === 'audiooutput');
+
+                    const inputSelect = document.getElementById('inputDevice');
+                    const outputSelect = document.getElementById('outputDevice');
+
+                    inputDevices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.textContent = device.label || `Dispositivo ${inputDevices.indexOf(device)}`;
+                        inputSelect.appendChild(option);
+                    });
+
+                    outputDevices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.textContent = device.label || `Dispositivo ${outputDevices.indexOf(device)}`;
+                        outputSelect.appendChild(option);
+                    });
+                } catch (err) {
+                    console.error('Error getting audio devices:', err);
+                }
+            };
+
+            // Iniciar captura de audio
+            const startAudio = async () => {
+                try {
+                    await init();
+
+                    const constraints = {
+                        audio: {
+                            deviceId: document.getElementById('inputDevice').value || undefined,
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: false,
+                        }
+                    };
+
+                    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const microphone = audioContext.createMediaStreamSource(mediaStream);
+                    microphone.connect(sourceNode);
+
+                    isProcessing = true;
+                    startAnalysis();
+                    updateStatus('Grabando', true);
+
+                } catch (err) {
+                    console.error('Error starting audio:', err);
+                    updateStatus('Error de grabación', false);
+                }
+            };
+
+            // Detener captura de audio
+            const stopAudio = () => {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+                isProcessing = false;
+                updateStatus('Detenido', false);
+            };
+
+            // Análisis en tiempo real
+            const startAnalysis = () => {
+                if (!analyser || !isProcessing) return;
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(dataArray);
+
+                const inputLevel = calculateLevel(dataArray);
+                updateInputMeter(inputLevel);
+                updateSpectrum(dataArray);
+
+                // Output analysis
+                const outputDataArray = new Uint8Array(analyserCompare.frequencyBinCount);
+                analyserCompare.getByteFrequencyData(outputDataArray);
+                const outputLevel = calculateLevel(outputDataArray);
+                updateOutputMeter(outputLevel);
+
+                requestAnimationFrame(startAnalysis);
+            };
+
+            // Calcular nivel en dB
+            const calculateLevel = (dataArray) => {
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i] * dataArray[i];
+                }
+                const rms = Math.sqrt(sum / dataArray.length) / 255;
+                return rms > 0 ? 20 * Math.log10(rms) : -Infinity;
+            };
+
+            // Herramientas útiles
+            const dbToGain = (db) => Math.pow(10, db / 20);
+            const gainToDb = (gain) => 20 * Math.log10(gain);
+
+            // Update métodos
+            const updateInputGain = (db) => {
+                state.inputGain = db;
+                if (sourceNode) {
+                    sourceNode.gain.value = dbToGain(db);
+                }
+                document.getElementById('inputGainValue').textContent = db.toFixed(1);
+            };
+
+            const updateMasterVolume = (db) => {
+                state.masterVolume = db;
+                if (processorNode) {
+                    processorNode.gain.value = dbToGain(db);
+                }
+                document.getElementById('masterVolumeValue').textContent = db.toFixed(1);
+            };
+
+            const updateInputMeter = (level) => {
+                const meter = document.getElementById('inputMeter');
+                const valueText = document.getElementById('inputMeterValue');
+                const clipLED = document.getElementById('inputClipLED');
+
+                const percentage = Math.max(0, Math.min(100, (level + 60) * 1.67)); // Rango -60 a 0 dB
+                meter.style.width = percentage + '%';
+                valueText.textContent = level > -999 ? level.toFixed(1) + ' dB' : '-∞ dB';
+
+                if (level > -1) {
+                    clipLED.classList.add('clipping');
+                } else {
+                    clipLED.classList.remove('clipping');
+                }
+            };
+
+            const updateOutputMeter = (level) => {
+                const meter = document.getElementById('outputMeter');
+                const valueText = document.getElementById('outputMeterValue');
+                const clipLED = document.getElementById('outputClipLED');
+
+                const percentage = Math.max(0, Math.min(100, (level + 60) * 1.67));
+                meter.style.width = percentage + '%';
+                valueText.textContent = level > -999 ? level.toFixed(1) + ' dB' : '-∞ dB';
+
+                if (level > -0.5) {
+                    clipLED.classList.add('clipping');
+                } else {
+                    clipLED.classList.remove('clipping');
+                }
+            };
+
+            const updateSpectrum = (dataArray) => {
+                const canvas = document.getElementById('spectrumCanvas');
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const width = canvas.offsetWidth;
+                const height = canvas.offsetHeight;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // Background
+                ctx.fillStyle = 'rgba(15, 25, 45, 0.6)';
+                ctx.fillRect(0, 0, width, height);
+
+                // Grid
+                ctx.strokeStyle = 'rgba(100, 200, 255, 0.15)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const x = (width / 10) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                    ctx.stroke();
+                }
+
+                // Spectrum
+                ctx.fillStyle = 'rgba(100, 200, 255, 0.7)';
+                const barWidth = (width / dataArray.length) * 2.5;
+                
+                for (let i = 0; i < dataArray.length; i++) {
+                    const barHeight = (dataArray[i] / 255) * height;
+                    const x = (i * barWidth);
+                    
+                    ctx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+                }
+
+                // Gradient line effect
+                ctx.strokeStyle = 'rgba(100, 200, 255, 0.9)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < dataArray.length; i += 3) {
+                    const barHeight = (dataArray[i] / 255) * height;
+                    const x = (i * barWidth);
+                    if (i === 0) {
+                        ctx.moveTo(x, height - barHeight);
+                    } else {
+                        ctx.lineTo(x, height - barHeight);
+                    }
+                }
+                ctx.stroke();
+            };
+
+            const updateSampleRateInfo = () => {
+                if (audioContext) {
+                    document.getElementById('sampleRateInfo').textContent = audioContext.sampleRate;
+                    const latency = audioContext.outputLatency * 1000 || 'N/A';
+                    document.getElementById('latencyInfo').textContent = 
+                        typeof latency === 'number' ? latency.toFixed(2) + ' ms' : latency;
+                }
+            };
+
+            const updateStatus = (text, active) => {
+                const statusText = document.getElementById('statusText');
+                const statusLED = document.getElementById('statusLED');
+                statusText.textContent = text;
+                if (active) {
+                    statusLED.classList.add('active');
+                } else {
+                    statusLED.classList.remove('active');
+                }
+            };
+
+            // API pública
+            return {
+                init,
+                startAudio,
+                stopAudio,
+                getAudioDevices,
+                updateInputGain,
+                updateMasterVolume,
+                state,
+                audioContext: () => audioContext,
+                isProcessing: () => isProcessing,
+            };
+        })();
+
+        // ============================================
+        // 🎚️ CONTROL INTERFACE
+        // ============================================
+
+        let processingEnabled = false;
+
+        const initializeUI = async () => {
+            // Power Button
+            document.getElementById('powerBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('powerBtn');
+                if (!processingEnabled) {
+                    await AudioProcessor.startAudio();
+                    processingEnabled = true;
+                    btn.classList.add('on');
+                    btn.textContent = '⚫ Power Off';
+                } else {
+                    AudioProcessor.stopAudio();
+                    processingEnabled = false;
+                    btn.classList.remove('on');
+                    btn.textContent = '⚪ Power On';
+                }
+            });
+
+            // Input/Output Controls
+            document.getElementById('inputGain').addEventListener('input', (e) => {
+                AudioProcessor.updateInputGain(parseFloat(e.target.value));
+            });
+
+            document.getElementById('masterVolume').addEventListener('input', (e) => {
+                AudioProcessor.updateMasterVolume(parseFloat(e.target.value));
+            });
+
+            // EQ Controls
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`eq${i}`).addEventListener('input', (e) => {
+                    document.getElementById(`eq${i}Val`).textContent = 
+                        parseFloat(e.target.value).toFixed(1);
+                });
+            }
+
+            // Dual Band Compressor
+            document.getElementById('lowThreshold').addEventListener('input', (e) => {
+                document.getElementById('lowThresholdVal').textContent = e.target.value;
+            });
+            document.getElementById('lowRatio').addEventListener('input', (e) => {
+                document.getElementById('lowRatioVal').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            document.getElementById('lowAttack').addEventListener('input', (e) => {
+                document.getElementById('lowAttackVal').textContent = e.target.value;
+            });
+            document.getElementById('lowRelease').addEventListener('input', (e) => {
+                document.getElementById('lowReleaseVal').textContent = e.target.value;
+            });
+
+            document.getElementById('highThreshold').addEventListener('input', (e) => {
+                document.getElementById('highThresholdVal').textContent = e.target.value;
+            });
+            document.getElementById('highRatio').addEventListener('input', (e) => {
+                document.getElementById('highRatioVal').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            document.getElementById('highAttack').addEventListener('input', (e) => {
+                document.getElementById('highAttackVal').textContent = e.target.value;
+            });
+            document.getElementById('highRelease').addEventListener('input', (e) => {
+                document.getElementById('highReleaseVal').textContent = e.target.value;
+            });
+
+            // Bass EQ
+            document.getElementById('bassBoost').addEventListener('input', (e) => {
+                document.getElementById('bassBoostValue').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            document.getElementById('bassFreq').addEventListener('input', (e) => {
+                document.getElementById('bassFreqValue').textContent = e.target.value;
+            });
+
+            // Stereo Enhancer
+            document.getElementById('stereoWidth').addEventListener('input', (e) => {
+                document.getElementById('stereoWidthValue').textContent = parseFloat(e.target.value).toFixed(2);
+            });
+
+            // Get Audio Devices
+            await AudioProcessor.getAudioDevices();
+
+            // Crear controles de Compressor Multibanda
+            createCompressorControls();
+            createGraphicEQControls();
+
+            // Draw EQ Curve
+            drawEQCurve();
+        };
+
+        const createCompressorControls = () => {
+            const container = document.getElementById('compressorControls');
+            container.innerHTML = '';
+
+            const bands = ['Sub-Bass (20-60Hz)', 'Bass (60-250Hz)', 'Mid (250-2k)', 'High-Mid (2k-6k)', 'Treble (6k-16k)'];
+
+            bands.forEach((name, idx) => {
+                const bandDiv = document.createElement('div');
+                bandDiv.style.cssText = 'padding: 8px; background: rgba(50, 100, 150, 0.1); border-radius: 4px; margin-bottom: 8px; font-size: 10px; color: #aabbcc;';
+                
+                bandDiv.innerHTML = `
+                    <div style="font-weight: 700; margin-bottom: 6px; color: #64c8ff;">${name}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px;">
+                        <div>
+                            <div>Threshold</div>
+                            <input type="range" id="compThresh${idx}" min="-60" max="0" value="-20" step="1" style="width: 100%; margin: 4px 0;">
+                            <div style="color: #64c8ff; font-weight: 700;"><span id="compThreshVal${idx}">-20</span>dB</div>
+                        </div>
+                        <div>
+                            <div>Ratio</div>
+                            <input type="range" id="compRatio${idx}" min="1" max="8" value="4" step="0.1" style="width: 100%; margin: 4px 0;">
+                            <div style="color: #64c8ff; font-weight: 700;"><span id="compRatioVal${idx}">4</span>:1</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                        <div>
+                            <div>Attack (ms)</div>
+                            <input type="range" id="compAttack${idx}" min="1" max="100" value="10" step="1" style="width: 100%; margin: 4px 0;">
+                            <div style="color: #64c8ff; font-weight: 700;"><span id="compAttackVal${idx}">10</span>ms</div>
+                        </div>
+                        <div>
+                            <div>Release (ms)</div>
+                            <input type="range" id="compRelease${idx}" min="10" max="500" value="100" step="10" style="width: 100%; margin: 4px 0;">
+                            <div style="color: #64c8ff; font-weight: 700;"><span id="compReleaseVal${idx}">100</span>ms</div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(bandDiv);
+
+                // Event listeners
+                document.getElementById(`compThresh${idx}`).addEventListener('input', (e) => {
+                    document.getElementById(`compThreshVal${idx}`).textContent = e.target.value;
+                });
+                document.getElementById(`compRatio${idx}`).addEventListener('input', (e) => {
+                    document.getElementById(`compRatioVal${idx}`).textContent = parseFloat(e.target.value).toFixed(1);
+                });
+                document.getElementById(`compAttack${idx}`).addEventListener('input', (e) => {
+                    document.getElementById(`compAttackVal${idx}`).textContent = e.target.value;
+                });
+                document.getElementById(`compRelease${idx}`).addEventListener('input', (e) => {
+                    document.getElementById(`compReleaseVal${idx}`).textContent = e.target.value;
+                });
+            });
+        };
+
+        const createGraphicEQControls = () => {
+            const container = document.getElementById('graphicEQControls');
+            container.innerHTML = '';
+
+            const frequencies = ['20Hz', '50Hz', '100Hz', '250Hz', '500Hz', '1kHz', '2kHz', '4kHz', '8kHz', '16kHz'];
+
+            frequencies.forEach((freq, idx) => {
+                const control = document.createElement('div');
+                control.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 9px; color: #aabbcc;';
+                
+                control.innerHTML = `
+                    <input type="range" id="graphEQ${idx}" min="-12" max="12" value="0" step="0.1" style="width: 30px; height: 100px; -webkit-appearance: slider-vertical; appearance: slider-vertical; outline: none;">
+                    <div style="color: #64c8ff; font-weight: 700; font-size: 10px;"><span id="graphEQVal${idx}">0</span>dB</div>
+                    <div>${freq}</div>
+                `;
+
+                container.appendChild(control);
+
+                document.getElementById(`graphEQ${idx}`).addEventListener('input', (e) => {
+                    document.getElementById(`graphEQVal${idx}`).textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            });
+
+            container.style.cssText = 'display: flex; gap: 8px; justify-content: space-around; padding: 12px 0;';
+        };
+
+        const drawEQCurve = () => {
+            const canvas = document.getElementById('eqCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Background
+            ctx.fillStyle = 'rgba(15, 25, 45, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
+            ctx.lineWidth = 1;
+            const gridLines = 5;
+            for (let i = 0; i <= gridLines; i++) {
+                const x = (width / gridLines) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+
+                const y = (height / gridLines) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // Frequency labels
+            ctx.fillStyle = 'rgba(170, 187, 204, 0.6)';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            const freqs = ['20Hz', '60Hz', '250Hz', '2kHz', '6kHz', '16kHz'];
+            const freqPositions = [0, 0.1, 0.3, 0.7, 0.85, 1];
+            freqPositions.forEach((pos, i) => {
+                ctx.fillText(freqs[i], width * pos, height - 8);
+            });
+
+            // Draw curve
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.9)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const eqValues = [
+                parseFloat(document.getElementById('eq0').value || 0),
+                parseFloat(document.getElementById('eq1').value || 0),
+                parseFloat(document.getElementById('eq2').value || 0),
+                parseFloat(document.getElementById('eq3').value || 0),
+                parseFloat(document.getElementById('eq4').value || 0),
+            ];
+
+            for (let i = 0; i <= 100; i++) {
+                const normalizedFreq = i / 100;
+                let gain = 0;
+
+                // Interpolate between EQ points
+                if (normalizedFreq < 0.15) {
+                    gain = eqValues[0] * (0.15 - normalizedFreq) / 0.15;
+                } else if (normalizedFreq < 0.3) {
+                    gain = eqValues[0] * (normalizedFreq - 0.15) / 0.15 + eqValues[1] * (0.3 - normalizedFreq) / 0.15;
+                } else if (normalizedFreq < 0.7) {
+                    gain = eqValues[1] * (normalizedFreq - 0.3) / 0.4 + eqValues[2] * (0.7 - normalizedFreq) / 0.4;
+                } else if (normalizedFreq < 0.85) {
+                    gain = eqValues[2] * (normalizedFreq - 0.7) / 0.15 + eqValues[3] * (0.85 - normalizedFreq) / 0.15;
+                } else {
+                    gain = eqValues[3] * (normalizedFreq - 0.85) / 0.15 + eqValues[4] * (normalizedFreq - 0.85) / 0.15;
+                }
+
+                const y = height / 2 - (gain / 12) * (height / 2);
+                const x = (width / 100) * i;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+
+            // Center line
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+        };
+
+        const updateEQ = () => {
+            drawEQCurve();
+        };
+
+        const updateProcessing = () => {
+            // Este método se puede expandir para actualizar todos los parámetros DSP
+        };
+
+        const toggleBypass = (module, isBypassed) => {
+            console.log(`${module} bypass: ${isBypassed}`);
+        };
+
+        const applyBassBoostPro = () => {
+            const bassBoost = parseFloat(document.getElementById('bassBoost').value);
+            const bassFreq = parseFloat(document.getElementById('bassFreq').value);
+            
+            // Aplicar efecto visual
+            const btn = event.target;
+            btn.style.background = 'rgba(0, 200, 100, 0.3)';
+            setTimeout(() => {
+                btn.style.background = '';
+            }, 300);
+        };
+
+        const loadPreset = (preset) => {
+            const presets = {
+                radiofm: {
+                    eqValues: [2, 3, -1, 2, 1],
+                    bassBoost: 3,
+                    lowThreshold: -18,
+                    highThreshold: -14,
+                },
+                voice: {
+                    eqValues: [-2, -1, 3, 2, -1],
+                    bassBoost: 1,
+                    lowThreshold: -20,
+                    highThreshold: -16,
+                },
+                music: {
+                    eqValues: [1, 2, 0, 1, 2],
+                    bassBoost: 4,
+                    lowThreshold: -22,
+                    highThreshold: -18,
+                },
+                ultrabass: {
+                    eqValues: [6, 5, -2, 0, -1],
+                    bassBoost: 12,
+                    lowThreshold: -25,
+                    highThreshold: -20,
+                },
+            };
+
+            const config = presets[preset];
+            if (!config) return;
+
+            // Aplicar valores
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`eq${i}`).value = config.eqValues[i];
+                document.getElementById(`eq${i}Val`).textContent = config.eqValues[i].toFixed(1);
+            }
+
+            document.getElementById('bassBoost').value = config.bassBoost;
+            document.getElementById('bassBoostValue').textContent = config.bassBoost.toFixed(1);
+
+            document.getElementById('lowThreshold').value = config.lowThreshold;
+            document.getElementById('lowThresholdVal').textContent = config.lowThreshold;
+
+            document.getElementById('highThreshold').value = config.highThreshold;
+            document.getElementById('highThresholdVal').textContent = config.highThreshold;
+
+            drawEQCurve();
+        };
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeUI();
+            drawEQCurve();
+        });
+
+        // Monitorear cambios en el EQ
+        document.addEventListener('change', () => {
+            drawEQCurve();
+        });
+
+        // Redraw en resize
+        window.addEventListener('resize', () => {
+            drawEQCurve();
+        });
+    </script>
+</body>
+</html>
